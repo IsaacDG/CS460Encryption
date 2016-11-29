@@ -24,8 +24,16 @@ public class Exchange {
 		byte[] dataCipher = s.encryptData(plain);
 		byte[] senderMAC = s.getMAC(plain);
 		byte[] dataPlain = r.decryptData(dataCipher);
+		boolean same = true;
+		for(int i = 0; i < dataPlain.length; i++){
+			if(plain[i] != dataPlain[i]){
+				same = false;
+			}
+		}
+		System.out.println(same);
 		if(r.dataGood(dataPlain, senderMAC)) System.out.println("MAC Verified By Receiver. . .");
-		fos.write(r.decryptData(s.encryptData(plain)));
+		fos.write(dataPlain);
+		//fos.write(r.decryptData(s.encryptData(plain)));
 		fos.close();
 		
 	}

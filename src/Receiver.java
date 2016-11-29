@@ -43,8 +43,12 @@ public class Receiver {
 		Mac mac = Mac.getInstance("HmacMD5");
 		mac.init(senderAES);
 		byte[] digest = mac.doFinal(data);
-		if(recMAC == digest) return true;
-		return false;
+		for(int i = 0; i < recMAC.length; i++){
+			if(recMAC[i] != digest[i]){
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	public void setSenderAES(byte[] k){

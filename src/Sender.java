@@ -45,7 +45,8 @@ public class Sender {
 	public byte[] getMAC(byte[] data)throws Exception{
 		Mac mac = Mac.getInstance("HmacMD5");
 		mac.init(pubAES);
-		return mac.doFinal(data);
+		byte[] digest = mac.doFinal(data);
+		return digest;
 	}
 	
 	public byte[] getEncryptedAES()throws Exception{
