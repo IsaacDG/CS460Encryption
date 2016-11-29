@@ -1,6 +1,7 @@
 import java.security.*;
 
 import javax.crypto.Cipher;
+import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -36,6 +37,14 @@ public class Receiver {
 		Cipher cipher = Cipher.getInstance("AES");
 		cipher.init(Cipher.DECRYPT_MODE, senderAES);
 		return cipher.doFinal(data);
+	}
+	
+	public boolean dataGood(byte[] data, byte[] recMAC)throws Exception{
+		Mac mac = Mac.getInstance("HmacMD5");
+		mac.init(senderAES);
+		byte[] digest = mac.doFinal(data);
+		if(recMAC == digest) return true;
+		return false;
 	}
 	
 	public void setSenderAES(byte[] k){

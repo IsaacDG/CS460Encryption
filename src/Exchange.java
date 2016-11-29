@@ -21,7 +21,12 @@ public class Exchange {
 		File f = new File(filePath);
 		byte[] plain = Files.readAllBytes(f.toPath());
 		FileOutputStream fos = new FileOutputStream("src/test1.txt");
+		byte[] dataCipher = s.encryptData(plain);
+		byte[] senderMAC = s.getMAC(plain);
+		byte[] dataPlain = r.decryptData(dataCipher);
+		if(r.dataGood(dataPlain, senderMAC)) System.out.println("MAC Verified By Receiver. . .");
 		fos.write(r.decryptData(s.encryptData(plain)));
+		fos.close();
 		
 	}
 
