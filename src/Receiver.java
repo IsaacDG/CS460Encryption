@@ -1,3 +1,5 @@
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.security.*;
 
 import javax.crypto.Cipher;
@@ -51,14 +53,24 @@ public class Receiver {
 		return true;
 	}
 	
-	public void setSenderAES(byte[] k){
+	public void setSenderAES()throws Exception{
 		System.out.println("Receiver: Got the Sender's encrypted AES key.");
+		FileInputStream fis = new FileInputStream("src/senderEncryptedAES.dat");
+		byte[] k = new byte[fis.available()];
+		fis.read(k);
+		fis.close();
 		senderEncAES = k;
 	}
 	
 	public Key givePublic(){
 		System.out.println("Receiver: Sending my RSA public key to the Sender. . .");
 		return pubRSA;
+	}
+	
+	public void releasePublic()throws Exception{
+		FileOutputStream fos = new FileOutputStream("src/receiverPubRSA.dat");
+		fos.write(pubRSA.getEncoded());
+		fos.close();
 	}
 	
 	

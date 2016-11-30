@@ -1,12 +1,10 @@
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.security.*;
-
-import javax.crypto.BadPaddingException;
+import java.security.spec.X509EncodedKeySpec;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.SecretKeySpec;
 
 public class Sender {
 	
@@ -25,6 +23,9 @@ public class Sender {
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.ENCRYPT_MODE, receiverPubRSA);
 		encryptedAESKey = cipher.doFinal(pubAES.getEncoded());
+		FileOutputStream fos = new FileOutputStream("src/senderEncryptedAES.dat");
+		fos.write(encryptedAESKey);
+		fos.close();
 	}
 	
 	public byte[] encryptData(byte[] data) throws Exception{
@@ -49,15 +50,20 @@ public class Sender {
 		return digest;
 	}
 	
-	public byte[] getEncryptedAES()throws Exception{
+	public void releaseEncryptedAES()throws Exception{
 		encryptAESKey();
 		System.out.println("Sender: Sending my encrypted AES key to Receiver. . .");
-		return encryptedAESKey;
 	}
 	
-	public void setReceiverPubRSA(Key k){
-		System.out.println("Sender: Got Receiver's public RSA key.");
-		receiverPubRSA = k;
+	public void setReceiverPubRSA()throws Exception{
+		FileInputStream fis = new FileInputStream("src/receiverPubRSA.dat");
+		byte[] k = new byte[fis.available()];
+		fis.read(k);
+		fis.close();
+		KeyFactory kf = KeyFactory.getInstance("RSA");
+		PublicKey pk = kf.generatePublic(new X509EncodedKeySpec(k));
+		receiverPubRSA = pk;
+		
 	}
 	
 	public Key getPub(){
