@@ -9,8 +9,8 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 public class Exchange {
-
-	public static void main(String[] args) throws Exception {
+	
+public static void main(String[] args) throws Exception {
 		
 		Receiver r = new Receiver();
 		Sender s = new Sender();
@@ -22,14 +22,30 @@ public class Exchange {
 		String filePath = "src/tosend.txt";
 		File f = new File(filePath);
 		byte[] plain = Files.readAllBytes(f.toPath());
-		FileOutputStream fos = new FileOutputStream("src/test1.txt");
-		byte[] dataCipher = s.encryptData(plain);
-		byte[] senderMAC = s.getMAC(plain);
-		byte[] dataPlain = r.decryptData(dataCipher);
-		if(r.dataGood(dataPlain, senderMAC)) System.out.println("MAC Verified By Receiver. . .");
-		fos.write(dataPlain);
-		fos.close();
+		s.encryptDataAddMAC(plain);
+		r.decryptDataWMAC();
 		
 	}
+
+//	public static void main(String[] args) throws Exception {
+//		
+//		Receiver r = new Receiver();
+//		Sender s = new Sender();
+//		r.releasePublic();
+//		s.setReceiverPubRSA();
+//		s.releaseEncryptedAES();
+//		r.setSenderAES();
+//		
+//		String filePath = "src/tosend.txt";
+//		File f = new File(filePath);
+//		byte[] plain = Files.readAllBytes(f.toPath());
+//		s.encryptData(plain);
+////		byte[] senderMAC = s.getMAC(plain);
+//		r.decryptData();
+////		if(r.dataGood(dataPlain, senderMAC)) System.out.println("MAC Verified By Receiver. . .");
+////		fos.write(dataPlain);
+////		fos.close();
+//		
+//	}
 
 }

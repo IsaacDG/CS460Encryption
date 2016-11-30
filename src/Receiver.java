@@ -1,6 +1,8 @@
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.nio.ByteBuffer;
 import java.security.*;
+import java.util.Arrays;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
@@ -33,23 +35,72 @@ public class Receiver {
 		
 	}
 	
-	public byte[] decryptData(byte[] data)throws Exception{
+	public void decryptData()throws Exception{
 		decryptSenderAES();
 		System.out.println("Receiver: Decrypting the data. . .");
 		Cipher cipher = Cipher.getInstance("AES");
 		cipher.init(Cipher.DECRYPT_MODE, senderAES);
-		return cipher.doFinal(data);
+		FileInputStream fis = new FileInputStream("src/encryptedData.dat");
+		byte[] data = new byte[fis.available()];
+		fis.read(data);
+		fis.close();
+		FileOutputStream fos = new FileOutputStream("src/decryptedData.dat");
+		fos.write(cipher.doFinal(data));
+		fos.close();
+	}
+	
+	public void decryptDataWMAC()throws Exception{
+		decryptSenderAES();
+		System.out.println("Receiver: Decrypting the data. . .");
+		Cipher cipher = Cipher.getInstance("AES");
+		cipher.init(Cipher.DECRYPT_MODE, senderAES);
+		FileInputStream fis = new FileInputStream("src/encryptedData.dat");
+		byte[] data = new byte[fis.available()];
+		fis.read(data);
+		fis.close();
+		byte[] datSizeArr = Arrays.copyOfRange(data, 0, 4);
+		ByteBuffer wrap = ByteBuffer.wrap(datSizeArr);
+		int datSize = wrap.getInt();
+		System.out.println("RECEIVER DATA: " + datSize);
+		byte[] dat = Arrays.copyOfRange(data, 4, 4 + datSize);
+//		for(int i = 0; i < dat.length; i++){
+//			System.out.print(dat[i]);
+//		}
+		
+		byte[] sizeMACArr = Arrays.copyOfRange(data, 4 + datSize, 4 + datSize + 4);
+		wrap = ByteBuffer.wrap(sizeMACArr);
+		int macSize = wrap.getInt();
+		System.out.println("RECEIVER MSIZE: " + macSize);
+		byte[] MAC = Arrays.copyOfRange(data, 4 + datSize + 4, 4 + datSize + 4 + macSize);
+		System.out.println();
+		for(int i = 0; i < MAC.length; i++){
+			System.out.print(MAC[i]);
+		}
+		System.out.println();
+		
+		byte[] decipheredDat = cipher.doFinal(dat);
+		
+		if(dataGood(decipheredDat, MAC)){
+			System.out.println("TRUE");
+		}
+		
+		FileOutputStream fos = new FileOutputStream("src/decryptedData.dat");
+		fos.write(decipheredDat);
+		fos.close();
 	}
 	
 	public boolean dataGood(byte[] data, byte[] recMAC)throws Exception{
 		Mac mac = Mac.getInstance("HmacMD5");
 		mac.init(senderAES);
 		byte[] digest = mac.doFinal(data);
+		System.out.println();
 		for(int i = 0; i < recMAC.length; i++){
+			System.out.print(digest[i]);
 			if(recMAC[i] != digest[i]){
 				return false;
 			}
 		}
+		System.out.println();
 		return true;
 	}
 	
