@@ -83,6 +83,7 @@ public class Receiver {
 	}
 	
 	public boolean dataGood(byte[] data, byte[] recMAC)throws Exception{
+		System.out.println("Receiver: Verifying MAC. . .");
 		Mac mac = Mac.getInstance("HmacMD5");
 		mac.init(senderAES);
 		byte[] digest = mac.doFinal(data);

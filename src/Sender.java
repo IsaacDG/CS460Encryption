@@ -43,28 +43,18 @@ public class Sender {
 		System.out.println("Sender: Encrypting the data with my AES key. . .");
 		Cipher cipher = Cipher.getInstance("AES");
 		cipher.init(Cipher.ENCRYPT_MODE, pubAES);
-		System.out.println("Sender: Sending the encrypted data to the Reciever. . .");
 		FileOutputStream fos = new FileOutputStream("src/encryptedData.dat");
 		byte[] dataCipher = cipher.doFinal(data);
 		byte[] dataMAC = getMAC(data);
 		
 		fos.write(ByteBuffer.allocate(4).putInt(dataCipher.length).array());
-		//System.out.println("SENDER DATA: " + dataCipher.length);
 		fos.write(dataCipher);
-//		for(int i = 0; i < dataCipher.length; i++){
-//			System.out.print(dataCipher[i]);
-//		}
 		fos.write(ByteBuffer.allocate(4).putInt(dataMAC.length).array());
-		//System.out.println("SENDER MSIZE: " + dataMAC.length);
 		
-//		System.out.println();
-//		for(int i = 0; i < dataMAC.length; i++){
-//			System.out.print(dataMAC[i]);
-//		}
-//		System.out.println();
-		
+		System.out.println("Sender: Appending MAC to data. . .");
 		fos.write(dataMAC);
 		fos.close();
+		System.out.println("Sender: Sending the encrypted data to the Reciever. . .");
 	}
 	
 	public byte[] decryptData(byte[] data) throws Exception{
