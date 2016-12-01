@@ -61,46 +61,36 @@ public class Receiver {
 		byte[] datSizeArr = Arrays.copyOfRange(data, 0, 4);
 		ByteBuffer wrap = ByteBuffer.wrap(datSizeArr);
 		int datSize = wrap.getInt();
-		System.out.println("RECEIVER DATA: " + datSize);
+
 		byte[] dat = Arrays.copyOfRange(data, 4, 4 + datSize);
-//		for(int i = 0; i < dat.length; i++){
-//			System.out.print(dat[i]);
-//		}
-		
+
 		byte[] sizeMACArr = Arrays.copyOfRange(data, 4 + datSize, 4 + datSize + 4);
 		wrap = ByteBuffer.wrap(sizeMACArr);
 		int macSize = wrap.getInt();
-		System.out.println("RECEIVER MSIZE: " + macSize);
 		byte[] MAC = Arrays.copyOfRange(data, 4 + datSize + 4, 4 + datSize + 4 + macSize);
-		System.out.println();
-		for(int i = 0; i < MAC.length; i++){
-			System.out.print(MAC[i]);
-		}
-		System.out.println();
-		
+
 		byte[] decipheredDat = cipher.doFinal(dat);
 		
 		if(dataGood(decipheredDat, MAC)){
-			System.out.println("TRUE");
+			System.out.println("Receiver: MAC verified, writing decrypted data to file. . . ");
+			FileOutputStream fos = new FileOutputStream("src/decryptedData.dat");
+			fos.write(decipheredDat);
+			fos.close();
+		} else {
+			System.out.println("Receiver: MAC could not be verified, closing program.");
 		}
 		
-		FileOutputStream fos = new FileOutputStream("src/decryptedData.dat");
-		fos.write(decipheredDat);
-		fos.close();
 	}
 	
 	public boolean dataGood(byte[] data, byte[] recMAC)throws Exception{
 		Mac mac = Mac.getInstance("HmacMD5");
 		mac.init(senderAES);
 		byte[] digest = mac.doFinal(data);
-		System.out.println();
 		for(int i = 0; i < recMAC.length; i++){
-			System.out.print(digest[i]);
 			if(recMAC[i] != digest[i]){
 				return false;
 			}
 		}
-		System.out.println();
 		return true;
 	}
 	

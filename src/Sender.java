@@ -49,19 +49,19 @@ public class Sender {
 		byte[] dataMAC = getMAC(data);
 		
 		fos.write(ByteBuffer.allocate(4).putInt(dataCipher.length).array());
-		System.out.println("SENDER DATA: " + dataCipher.length);
+		//System.out.println("SENDER DATA: " + dataCipher.length);
 		fos.write(dataCipher);
 //		for(int i = 0; i < dataCipher.length; i++){
 //			System.out.print(dataCipher[i]);
 //		}
 		fos.write(ByteBuffer.allocate(4).putInt(dataMAC.length).array());
-		System.out.println("SENDER MSIZE: " + dataMAC.length);
+		//System.out.println("SENDER MSIZE: " + dataMAC.length);
 		
-		System.out.println();
-		for(int i = 0; i < dataMAC.length; i++){
-			System.out.print(dataMAC[i]);
-		}
-		System.out.println();
+//		System.out.println();
+//		for(int i = 0; i < dataMAC.length; i++){
+//			System.out.print(dataMAC[i]);
+//		}
+//		System.out.println();
 		
 		fos.write(dataMAC);
 		fos.close();
@@ -76,7 +76,7 @@ public class Sender {
 	
 	public byte[] getMAC(byte[] data)throws Exception{
 		Mac mac = Mac.getInstance("HmacMD5");
-		mac.init(pubAES);
+		mac.init(pubAES);			//initialize HMAC using my AES key.
 		byte[] digest = mac.doFinal(data);
 		return digest;
 	}
